@@ -1,0 +1,19 @@
+
+export enum DiffType {
+  Unchanged = 'unchanged',
+  Added = 'added',
+  Removed = 'removed',
+}
+
+export interface DiffLine {
+  type: DiffType;
+  text: string;
+}
+
+export interface PanelData {
+  id: string;
+  text: string;
+  title: string;
+}
+
+export type ThreePanelLayout = 'stacked' | 'side-by-side';

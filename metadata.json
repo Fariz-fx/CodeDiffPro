@@ -1,0 +1,5 @@
+{
+  "name": "CodeDiff Pro",
+  "description": "An advanced text and code comparison tool that allows you to compare up to four files side-by-side. Features real-time difference highlighting and an AI-powered summary of changes.",
+  "requestFramePermissions": []
+}
