@@ -40,34 +40,32 @@
         --color-diff-remove-bg: rgba(239, 68, 68, 0.2); /* red-500 opacity 20 */
         --color-diff-add-text: #34d399; /* green-400 */
         --color-diff-remove-text: #f87171; /* red-400 */
-        --color-sync-pulse: rgba(34, 211, 238, 0.2); /* cyan-400 opacity 20 */
         --color-find-match-bg: rgba(251, 191, 36, 0.3); /* amber-400 opacity 30 */
         --color-find-active-match-bg: rgba(251, 191, 36, 0.6); /* amber-400 opacity 60 */
       }
 
       /* Light Theme */
       .theme-light {
-        --color-bg-primary: #f9fafb; /* gray-50 */
-        --color-bg-secondary: #ffffff;
-        --color-bg-tertiary: #f3f4f6; /* gray-100 */
-        --color-bg-tertiary-hover: #e5e7eb; /* gray-200 */
-        --color-border: #d1d5db; /* gray-300 */
-        --color-text-primary: #111827; /* gray-900 */
-        --color-text-secondary: #374151; /* gray-700 */
-        --color-text-muted: #6b7280; /* gray-500 */
-        --color-text-disabled: #9ca3af; /* gray-400 */
-        --color-accent: #0891b2; /* cyan-600 */
-        --color-accent-hover: #06b6d4; /* cyan-500 */
-        --color-accent-bg: #06b6d4; /* cyan-500 */
-        --color-accent-bg-hover: #0891b2; /* cyan-600 */
-        --color-caret: #111827;
-        --color-diff-add-bg: rgba(16, 185, 129, 0.1);
-        --color-diff-remove-bg: rgba(239, 68, 68, 0.1);
-        --color-diff-add-text: #10b981; /* green-500 */
-        --color-diff-remove-text: #ef4444; /* red-500 */
-        --color-sync-pulse: rgba(8, 145, 178, 0.2); /* cyan-600 opacity 20 */
-        --color-find-match-bg: rgba(251, 191, 36, 0.3);
-        --color-find-active-match-bg: rgba(251, 191, 36, 0.6);
+        --color-bg-primary: #ffffff;
+        --color-bg-secondary: #f8f9fa;
+        --color-bg-tertiary: #e9ecef;
+        --color-bg-tertiary-hover: #dee2e6;
+        --color-border: #dee2e6;
+        --color-text-primary: #212529;
+        --color-text-secondary: #495057;
+        --color-text-muted: #6c757d;
+        --color-text-disabled: #adb5bd;
+        --color-accent: #007bff;
+        --color-accent-hover: #0056b3;
+        --color-accent-bg: #007bff;
+        --color-accent-bg-hover: #0056b3;
+        --color-caret: #212529;
+        --color-diff-add-bg: #d4edda;
+        --color-diff-remove-bg: #f8d7da;
+        --color-diff-add-text: #155724;
+        --color-diff-remove-text: #721c24;
+        --color-find-match-bg: rgba(255, 193, 7, 0.4);
+        --color-find-active-match-bg: rgba(255, 193, 7, 0.7);
       }
 
       /* Solarized Light Theme */
@@ -76,21 +74,20 @@
         --color-bg-secondary: #eee8d5; /* base2 */
         --color-bg-tertiary: #93a1a1; /* base1 */
         --color-bg-tertiary-hover: #839496; /* base0 */
-        --color-border: #93a1a1; /* base1 */
+        --color-border: #eee8d5;
         --color-text-primary: #586e75; /* base01 */
         --color-text-secondary: #657b83; /* base00 */
         --color-text-muted: #839496; /* base0 */
         --color-text-disabled: #93a1a1; /* base1 */
-        --color-accent: #2aa198; /* cyan */
-        --color-accent-hover: #268bd2; /* blue */
-        --color-accent-bg: #2aa198; /* cyan */
-        --color-accent-bg-hover: #268bd2; /* blue */
-        --color-caret: #586e75;
+        --color-accent: #268bd2; /* blue */
+        --color-accent-hover: #2aa198; /* cyan */
+        --color-accent-bg: #268bd2;
+        --color-accent-bg-hover: #2aa198;
+        --color-caret: #073642; /* base03 */
         --color-diff-add-bg: rgba(133, 153, 0, 0.2); /* green */
         --color-diff-remove-bg: rgba(220, 50, 47, 0.2); /* red */
         --color-diff-add-text: #859900; /* green */
         --color-diff-remove-text: #dc322f; /* red */
-        --color-sync-pulse: rgba(42, 161, 152, 0.2); /* cyan opacity 20 */
         --color-find-match-bg: rgba(181, 137, 0, 0.3); /* yellow */
         --color-find-active-match-bg: rgba(181, 137, 0, 0.6); /* yellow */
       }
@@ -123,16 +120,6 @@
         background: transparent !important;
         margin: 0;
         padding: 0;
-      }
-      /* Animation for scroll sync indicator */
-      @keyframes pulse-sync {
-        50% {
-          background-color: var(--color-sync-pulse);
-          opacity: 0.7;
-        }
-      }
-      .animate-pulse-sync {
-        animation: pulse-sync 400ms cubic-bezier(0.4, 0, 0.6, 1);
       }
     </style>
   <script type="importmap">

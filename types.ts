@@ -29,3 +29,8 @@ export interface FindOptions {
   caseSensitive: boolean;
   useRegex: boolean;
 }
+
+export interface FoldableRange {
+    startLine: number;
+    endLine: number;
+}

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { PanelData, DiffLine, ThreePanelLayout, EditorTheme, Match, FindOptions } from './types';
 import { calculateDiff } from './utils/diff';
@@ -5,6 +6,7 @@ import { summarizeDifferences } from './services/geminiService';
 import { Header } from './components/Header';
 import { EditorPanel } from './components/EditorPanel';
 import { FindReplaceWidget } from './components/FindReplaceWidget';
+import { HelpModal } from './components/HelpModal';
 import { escapeRegExp } from './utils/regex';
 
 const initialPanels: PanelData[] = [
@@ -18,7 +20,6 @@ const App: React.FC = () => {
     const [summary, setSummary] = useState<string>('');
     const [isSummarizing, setIsSummarizing] = useState<boolean>(false);
     const [threePanelLayout, setThreePanelLayout] = useState<ThreePanelLayout>('stacked');
-    const [syncingPanelIds, setSyncingPanelIds] = useState<string[]>([]);
     const [theme, setTheme] = useState<EditorTheme>('dark');
     
     // Find & Replace State
@@ -29,9 +30,14 @@ const App: React.FC = () => {
     const [matches, setMatches] = useState<Match[]>([]);
     const [activeMatchIndex, setActiveMatchIndex] = useState(-1);
 
+    // Code Folding State
+    const [foldedLines, setFoldedLines] = useState<Map<string, Set<number>>>(new Map());
+    
+    // Help Modal State
+    const [isHelpVisible, setIsHelpVisible] = useState(false);
+
     const panelScrollRefs = useRef<(HTMLDivElement | null)[]>([]);
     const isSyncingScroll = useRef(false);
-    const syncIndicatorTimer = useRef<number | null>(null);
 
     // Theme Management Effect
     useEffect(() => {
@@ -121,24 +127,37 @@ const App: React.FC = () => {
         }
     }, [activeMatchIndex, matches, panels]);
 
-
-    const addPanel = () => {
-        if (panels.length < 4) {
+    const addPanel = useCallback(() => {
+        setPanels(prev => {
+            if (prev.length >= 4) return prev;
             const newPanel: PanelData = { 
                 id: crypto.randomUUID(), 
                 text: '', 
-                title: `Comparison ${panels.length}` 
+                title: `Comparison ${prev.length}` 
             };
-            setPanels(prev => [...prev, newPanel]);
-        }
-    };
+            return [...prev, newPanel];
+        });
+    }, []);
 
-    const removePanel = () => {
-        if (panels.length > 2) {
-            setPanels(prev => prev.slice(0, -1));
-            panelScrollRefs.current = panelScrollRefs.current.slice(0, -1);
-        }
-    };
+    const removeLastPanel = useCallback(() => {
+        setPanels(currentPanels => {
+            if (currentPanels.length <= 2) {
+                return currentPanels;
+            }
+            const lastPanelId = currentPanels[currentPanels.length - 1].id;
+            
+            setFoldedLines(currentFoldedLines => {
+                const newFoldedLines = new Map(currentFoldedLines);
+                if (newFoldedLines.has(lastPanelId)) {
+                    newFoldedLines.delete(lastPanelId);
+                    return newFoldedLines;
+                }
+                return currentFoldedLines;
+            });
+    
+            return currentPanels.slice(0, -1);
+        });
+    }, []);
 
     const updatePanelText = (id: string, newText: string) => {
         setPanels(prev => prev.map(p => (p.id === id ? { ...p, text: newText } : p)));
@@ -148,13 +167,67 @@ const App: React.FC = () => {
         setPanels(prev => prev.map(p => (p.id === id ? { ...p, title: newTitle } : p)));
     };
 
-    const handleSummarize = async () => {
+    const handleSummarize = useCallback(async () => {
+        if (isSummarizing) return;
         setIsSummarizing(true);
         setSummary('');
         const result = await summarizeDifferences(panels);
         setSummary(result);
         setIsSummarizing(false);
-    };
+    }, [panels, isSummarizing]);
+    
+    const toggleHelpModal = useCallback(() => setIsHelpVisible(v => !v), []);
+
+    // Keyboard Shortcuts Effect
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+            const modKey = isMac ? e.metaKey : e.ctrlKey;
+            const target = e.target as HTMLElement;
+            const isEditing = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA';
+
+            // Toggle Help: '?' or Cmd/Ctrl + /
+            if (e.key === '?' || (modKey && e.key === '/')) {
+                if (isEditing && e.key === '?') return; 
+                e.preventDefault();
+                toggleHelpModal();
+                return;
+            }
+
+            // Toggle Find/Replace: Cmd/Ctrl + F
+            if (modKey && e.key.toLowerCase() === 'f') {
+                e.preventDefault();
+                setIsFindVisible(v => !v);
+            }
+
+            // The rest of the shortcuts should not trigger while editing text.
+            if (isEditing) return;
+
+            // AI Summary: Cmd/Ctrl + Shift + S
+            if (modKey && e.shiftKey && e.key.toLowerCase() === 's') {
+                e.preventDefault();
+                handleSummarize();
+            }
+    
+            // Add Panel: Cmd/Ctrl + Alt + N
+            if (modKey && e.altKey && e.key.toLowerCase() === 'n') {
+                e.preventDefault();
+                addPanel();
+            }
+    
+            // Remove Panel: Cmd/Ctrl + Alt + W
+            if (modKey && e.altKey && e.key.toLowerCase() === 'w') {
+                e.preventDefault();
+                removeLastPanel();
+            }
+        };
+
+        document.addEventListener('keydown', handleKeyDown);
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [handleSummarize, addPanel, removeLastPanel, toggleHelpModal]);
+
 
     const handleScroll = useCallback((scrolledPanelId: string, scrollTop: number, scrollLeft: number) => {
         if (isSyncingScroll.current) return;
@@ -166,28 +239,32 @@ const App: React.FC = () => {
             return;
         }
 
-        const idsToSync: string[] = [];
         panelScrollRefs.current.forEach((ref, index) => {
             if (ref && index !== scrolledPanelIndex) {
                 ref.scrollTop = scrollTop;
                 ref.scrollLeft = scrollLeft;
-                idsToSync.push(panels[index].id);
             }
         });
         
-        setSyncingPanelIds(idsToSync);
-
-        if (syncIndicatorTimer.current) {
-            clearTimeout(syncIndicatorTimer.current);
-        }
-        syncIndicatorTimer.current = window.setTimeout(() => {
-            setSyncingPanelIds([]);
-        }, 400);
-
         requestAnimationFrame(() => {
             isSyncingScroll.current = false;
         });
     }, [panels]);
+
+    // Fix: Explicitly type `prev` to resolve a type inference issue on the argument to `new Set()`.
+    const handleToggleFold = (panelId: string, line: number) => {
+        setFoldedLines((prev: Map<string, Set<number>>) => {
+            const newMap = new Map(prev);
+            const panelSet = new Set(newMap.get(panelId) || []);
+            if (panelSet.has(line)) {
+                panelSet.delete(line);
+            } else {
+                panelSet.add(line);
+            }
+            newMap.set(panelId, panelSet);
+            return newMap;
+        });
+    };
 
     const handleFindNext = () => setActiveMatchIndex(prev => (prev + 1) % matches.length);
     const handleFindPrev = () => setActiveMatchIndex(prev => (prev - 1 + matches.length) % matches.length);
@@ -253,7 +330,7 @@ const App: React.FC = () => {
             <Header
                 panelCount={panels.length}
                 onAddPanel={addPanel}
-                onRemovePanel={removePanel}
+                onRemovePanel={removeLastPanel}
                 onSummarize={handleSummarize}
                 isSummarizing={isSummarizing}
                 threePanelLayout={threePanelLayout}
@@ -261,8 +338,11 @@ const App: React.FC = () => {
                 theme={theme}
                 onThemeChange={setTheme}
                 onToggleFind={() => setIsFindVisible(v => !v)}
+                onToggleHelp={toggleHelpModal}
             />
             
+            {isHelpVisible && <HelpModal onClose={toggleHelpModal} />}
+
             {isFindVisible && (
                 <FindReplaceWidget
                     findQuery={findQuery}
@@ -294,9 +374,10 @@ const App: React.FC = () => {
                         diffResult={diffResults[index] || null}
                         scrollRef={el => panelScrollRefs.current[index] = el}
                         onScroll={handleScroll}
-                        isSyncing={syncingPanelIds.includes(panel.id)}
                         matches={panelMatches.get(panel.id) || []}
                         activeMatch={matches[activeMatchIndex]?.panelId === panel.id ? matches[activeMatchIndex] : undefined}
+                        foldedLines={foldedLines.get(panel.id) || new Set()}
+                        onToggleFold={(line: number) => handleToggleFold(panel.id, line)}
                     />
                 ))}
             </main>

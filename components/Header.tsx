@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { IconButton } from './IconButton';
 import { ThreePanelLayout, EditorTheme } from '../types';
@@ -13,6 +14,7 @@ interface HeaderProps {
   theme: EditorTheme;
   onThemeChange: (theme: EditorTheme) => void;
   onToggleFind: () => void;
+  onToggleHelp: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({ 
@@ -25,7 +27,8 @@ export const Header: React.FC<HeaderProps> = ({
   onToggleLayout,
   theme,
   onThemeChange,
-  onToggleFind
+  onToggleFind,
+  onToggleHelp
 }) => {
   return (
     <header className="flex-shrink-0 flex items-center justify-between bg-[var(--color-bg-secondary)] p-3 rounded-lg border border-[var(--color-border)]">
@@ -33,8 +36,12 @@ export const Header: React.FC<HeaderProps> = ({
         CodeDiff <span className="text-[var(--color-accent)]">Pro</span>
       </h1>
       <div className="flex items-center gap-4">
-        <IconButton onClick={onToggleFind} ariaLabel="Find and Replace">
+        <IconButton onClick={onToggleFind} ariaLabel="Find and Replace (Ctrl+F)">
           <FindIcon />
+        </IconButton>
+
+        <IconButton onClick={onToggleHelp} ariaLabel="Help and keyboard shortcuts (?)">
+          <HelpIcon />
         </IconButton>
         
         <div className="relative">
@@ -91,6 +98,14 @@ const FindIcon: React.FC = () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <circle cx="11" cy="11" r="8"></circle>
         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+);
+
+const HelpIcon: React.FC = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+        <line x1="12" y1="17" x2="12.01" y2="17"></line>
     </svg>
 );
 
