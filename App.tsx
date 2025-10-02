@@ -3,10 +3,12 @@ import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import { PanelData, DiffLine, ThreePanelLayout, EditorTheme, Match, FindOptions } from './types';
 import { calculateDiff } from './utils/diff';
 import { summarizeDifferences } from './services/geminiService';
+import { generateSimpleSummary } from './utils/summary';
 import { Header } from './components/Header';
 import { EditorPanel } from './components/EditorPanel';
 import { FindReplaceWidget } from './components/FindReplaceWidget';
 import { HelpModal } from './components/HelpModal';
+import { ApiKeyModal } from './components/ApiKeyModal';
 import { escapeRegExp } from './utils/regex';
 
 const initialPanels: PanelData[] = [
@@ -35,6 +37,10 @@ const App: React.FC = () => {
     
     // Help Modal State
     const [isHelpVisible, setIsHelpVisible] = useState(false);
+
+    // API Key State
+    const [apiKey, setApiKey] = useState<string>(() => localStorage.getItem('gemini_api_key') || '');
+    const [isApiKeyModalVisible, setIsApiKeyModalVisible] = useState<boolean>(false);
 
     const panelScrollRefs = useRef<(HTMLDivElement | null)[]>([]);
     const isSyncingScroll = useRef(false);
@@ -167,16 +173,33 @@ const App: React.FC = () => {
         setPanels(prev => prev.map(p => (p.id === id ? { ...p, title: newTitle } : p)));
     };
 
-    const handleSummarize = useCallback(async () => {
+    const handleSimpleSummary = useCallback(() => {
+        if (panels.length < 2) {
+            setSummary("At least two panels are needed for a summary.");
+            return;
+        }
+        setSummary(generateSimpleSummary(diffResults, panels));
+    }, [diffResults, panels]);
+
+    const handleAiSummary = useCallback(async () => {
+        if (!apiKey) {
+            setIsApiKeyModalVisible(true);
+            return;
+        }
         if (isSummarizing) return;
         setIsSummarizing(true);
         setSummary('');
-        const result = await summarizeDifferences(panels);
+        const result = await summarizeDifferences(panels, apiKey);
         setSummary(result);
         setIsSummarizing(false);
-    }, [panels, isSummarizing]);
+    }, [panels, isSummarizing, apiKey]);
     
     const toggleHelpModal = useCallback(() => setIsHelpVisible(v => !v), []);
+
+    const handleSaveApiKey = (key: string) => {
+        setApiKey(key);
+        localStorage.setItem('gemini_api_key', key);
+    };
 
     // Keyboard Shortcuts Effect
     useEffect(() => {
@@ -206,7 +229,7 @@ const App: React.FC = () => {
             // AI Summary: Cmd/Ctrl + Shift + S
             if (modKey && e.shiftKey && e.key.toLowerCase() === 's') {
                 e.preventDefault();
-                handleSummarize();
+                handleAiSummary();
             }
     
             // Add Panel: Cmd/Ctrl + Alt + N
@@ -226,7 +249,7 @@ const App: React.FC = () => {
         return () => {
             document.removeEventListener('keydown', handleKeyDown);
         };
-    }, [handleSummarize, addPanel, removeLastPanel, toggleHelpModal]);
+    }, [handleAiSummary, addPanel, removeLastPanel, toggleHelpModal]);
 
 
     const handleScroll = useCallback((scrolledPanelId: string, scrollTop: number, scrollLeft: number) => {
@@ -251,7 +274,6 @@ const App: React.FC = () => {
         });
     }, [panels]);
 
-    // Fix: Explicitly type `prev` to resolve a type inference issue on the argument to `new Set()`.
     const handleToggleFold = (panelId: string, line: number) => {
         setFoldedLines((prev: Map<string, Set<number>>) => {
             const newMap = new Map(prev);
@@ -331,7 +353,8 @@ const App: React.FC = () => {
                 panelCount={panels.length}
                 onAddPanel={addPanel}
                 onRemovePanel={removeLastPanel}
-                onSummarize={handleSummarize}
+                onSimpleSummary={handleSimpleSummary}
+                onAiSummary={handleAiSummary}
                 isSummarizing={isSummarizing}
                 threePanelLayout={threePanelLayout}
                 onToggleLayout={() => setThreePanelLayout(p => p === 'stacked' ? 'side-by-side' : 'stacked')}
@@ -342,6 +365,7 @@ const App: React.FC = () => {
             />
             
             {isHelpVisible && <HelpModal onClose={toggleHelpModal} />}
+            {isApiKeyModalVisible && <ApiKeyModal onClose={() => setIsApiKeyModalVisible(false)} onSave={handleSaveApiKey} currentKey={apiKey} />}
 
             {isFindVisible && (
                 <FindReplaceWidget
@@ -383,7 +407,7 @@ const App: React.FC = () => {
             </main>
             {(isSummarizing || summary) && (
                 <div className="flex-shrink-0 bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg p-4 max-h-48 overflow-y-auto">
-                    <h3 className="text-lg font-semibold mb-2 text-[var(--color-accent)]">AI Summary of Differences</h3>
+                    <h3 className="text-lg font-semibold mb-2 text-[var(--color-accent)]">Summary of Differences</h3>
                     {isSummarizing ? (
                         <div className="flex items-center gap-2 text-[var(--color-text-muted)]">
                            <div className="w-4 h-4 border-2 border-t-transparent border-[var(--color-accent)] rounded-full animate-spin"></div>

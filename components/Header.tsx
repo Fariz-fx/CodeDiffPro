@@ -7,7 +7,8 @@ interface HeaderProps {
   panelCount: number;
   onAddPanel: () => void;
   onRemovePanel: () => void;
-  onSummarize: () => void;
+  onSimpleSummary: () => void;
+  onAiSummary: () => void;
   isSummarizing: boolean;
   threePanelLayout: ThreePanelLayout;
   onToggleLayout: () => void;
@@ -21,7 +22,8 @@ export const Header: React.FC<HeaderProps> = ({
   panelCount, 
   onAddPanel, 
   onRemovePanel, 
-  onSummarize, 
+  onSimpleSummary,
+  onAiSummary,
   isSummarizing,
   threePanelLayout,
   onToggleLayout,
@@ -80,8 +82,16 @@ export const Header: React.FC<HeaderProps> = ({
             <PlusIcon />
           </IconButton>
         </div>
+        
         <button
-          onClick={onSummarize}
+          onClick={onSimpleSummary}
+          disabled={panelCount < 2}
+          className="px-4 py-2 text-sm font-semibold rounded-md bg-[var(--color-bg-tertiary)] text-[var(--color-text-primary)] hover:bg-[var(--color-bg-tertiary-hover)] disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Simple Summary
+        </button>
+        <button
+          onClick={onAiSummary}
           disabled={isSummarizing || panelCount < 2}
           className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-[var(--color-accent-bg)] rounded-md transition-colors hover:bg-[var(--color-accent-bg-hover)] disabled:bg-[var(--color-bg-tertiary)] disabled:text-[var(--color-text-disabled)] disabled:cursor-not-allowed"
         >
