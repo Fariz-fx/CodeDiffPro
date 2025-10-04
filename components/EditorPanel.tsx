@@ -20,14 +20,14 @@ interface EditorPanelProps {
   onToggleFold: (line: number) => void;
 }
 
-const getLineStyle = (type: DiffType): React.CSSProperties => {
+const getLineClass = (type: DiffType): string => {
   switch (type) {
     case DiffType.Added:
-      return { backgroundColor: 'var(--color-diff-add-bg)' };
+      return 'diff-added';
     case DiffType.Removed:
-      return { backgroundColor: 'var(--color-diff-remove-bg)' };
+      return 'diff-removed';
     default:
-      return {};
+      return '';
   }
 };
 
@@ -260,8 +260,8 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
         <div key={originalIndex} className="flex h-6 text-right text-[var(--color-text-muted)] select-none">
           <div className="w-5 mr-2">
             {isFoldable ? (
-              <button onClick={() => onToggleFold(lineNum)} className="w-full text-center hover:text-[var(--color-text-primary)]">
-                {isFolded ? '›' : '˅'}
+              <button type="button" onClick={() => onToggleFold(lineNum)} className="w-full text-center hover:text-[var(--color-text-primary)]">
+                {isFolded ? '▸' : '▾'}
               </button>
             ) : ' '}
           </div>
@@ -270,7 +270,14 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
           <span className={`w-4 ml-2 text-center ${isBasePanel ? 'text-transparent' : getLineSymbolClass(line.type)}`}>{isBasePanel ? ' ' : symbol}</span>
            {isFolded && (
              <div className="absolute left-5 right-0 mt-6 -ml-px">
-                <div className="inline-block border rounded-full px-2 text-xs bg-[var(--color-bg-tertiary)] border-[var(--color-border)] cursor-pointer" onClick={() => onToggleFold(lineNum)}>... {foldedLineCount} lines</div>
+                <button
+                  type="button"
+                  className="inline-block border rounded-full px-2 text-xs bg-[var(--color-bg-tertiary)] border-[var(--color-border)] cursor-pointer"
+                  onClick={() => onToggleFold(lineNum)}
+                  aria-label={`Expand ${foldedLineCount} folded lines`}
+                >
+                  ... {foldedLineCount} lines
+                </button>
              </div>
            )}
         </div>
@@ -306,6 +313,8 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
               spellCheck="false"
               className="col-start-1 row-start-1 z-20 p-2 pb-24 bg-transparent text-transparent caret-[var(--color-caret)] resize-none border-none outline-none whitespace-pre"
               wrap="off"
+              title="Editor text area"
+              placeholder="Enter code here"
             />
           
             <div
@@ -323,7 +332,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                  }
 
                 return (
-                  <div key={originalIndex} style={getLineStyle(line.type)} className="h-6">
+                  <div key={originalIndex} className={`h-6 ${getLineClass(line.type)}`}>
                     <span dangerouslySetInnerHTML={{ __html: lineHtml || '&nbsp;' }} />
                   </div>
                 );
