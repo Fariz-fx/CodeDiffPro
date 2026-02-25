@@ -1,0 +1,26 @@
+name: codediffpro
+metadata:
+  description: CodeDiffPro - Code comparison tool deployed to Azure Static Web Apps
+  template: react-app
+
+services:
+  web:
+    project: .
+    language: typescript
+    host: staticwebapp
+
+infra:
+  template: bicep
+  path: ./infra/main.bicep
+  parameters: ./infra/main.parameters.json
+
+env:
+  - name: VITE_APP_URL
+    value: https://${AZURE_ENV_NAME}.azurestaticapps.net
+
+hooks:
+  deploy:
+    - shell: npm
+      args: ["run", "build"]
+      interactive: false
+      continueOnError: false

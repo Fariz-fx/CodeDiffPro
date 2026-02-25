@@ -1,0 +1,53 @@
+Product Specification: CodeDiff Pro
+1. Product Overview
+Product Name: CodeDiff Pro
+Tagline: Advanced Side-by-Side Code Comparison with AI Summaries
+Description:
+CodeDiff Pro is an advanced, browser-based text and code comparison tool that allows you to compare up to four files side-by-side. It is designed for developers, writers, and anyone needing to track changes between different versions of a document or codebase. The tool features real-time difference highlighting, syntax highlighting for multiple languages, and an AI-powered summary of changes powered by the Google Gemini API.
+2. Goals & Objectives
+Provide a clear, visual, and intuitive comparison of text and code differences across multiple files.
+Enhance developer productivity by simplifying code reviews, merge conflicts, and refactoring analysis.
+Empower users to quickly understand the substance of complex changes through AI-powered, natural language summaries.
+Offer a highly responsive, client-side experience with customizable themes and layouts to suit user preferences.
+3. Target Users
+Software Developers: For code reviews, debugging, and analyzing changes between branches.
+DevOps Engineers: For comparing configuration files (e.g., YAML, JSON) and deployment scripts.
+QA Professionals: For validating output differences and tracking changes in test data.
+Technical Writers & Content Creators: For comparing different drafts of documentation or articles.
+4. Core Features
+4.1 AI-Powered Summarization
+Automatically generates a high-level, natural language summary of the differences between panels using the Google Gemini AI. This helps users quickly grasp the intent behind the changes.
+4.2 Multi-Panel Comparison
+Supports comparing a base file against up to three other versions simultaneously in a two, three, or four-panel layout.
+4.3 Real-time Diff Highlighting
+Utilizes a client-side Longest Common Subsequence (LCS) algorithm to visually highlight added, removed, and unchanged lines in real-time as the user types.
+4.4 Unified Interface
+A single-page application dashboard to manage comparison panels, view differences, customize the editor, and generate summaries.
+4.5 Advanced Editor Features
+Includes syntax highlighting for multiple languages (inferred from file titles like .js, .ts, .css), code folding for cleaner views, synchronized scrolling, and keyboard shortcuts for power users.
+4.6 Find and Replace
+A comprehensive find and replace widget with support for case sensitivity and regular expressions across all panels.
+4.7 Customizable UI
+Provides multiple themes (Dark, Light, Solarized) and flexible layouts (e.g., stacked vs. side-by-side for 3 panels) to create a personalized user experience.
+5. Architecture Overview
+CodeDiff Pro is a purely client-side, single-page web application built with a modern frontend stack.
+Frontend Web App: Built with React and TypeScript, using Vite as the build tool. The responsive UI is styled with Tailwind CSS. State management is handled within React components using hooks.
+Diffing & Syntax Highlighting Engine:
+Diffing: A custom client-side algorithm (utils/diff.ts) calculates line-by-line differences without needing a server.
+Syntax Highlighting: Integrates the Prism.js library to provide language-aware code highlighting.
+Local Storage: User configuration, specifically the Gemini API key, is stored securely in the browser's Local Storage for persistence across sessions. No server-side database is used.
+Third-party Integrations:
+Google Gemini AI: Communicates directly from the client to the Gemini API (@google/genai SDK) to generate intelligent summaries of code changes.
+
+6. Requirements
+Users can input text by typing or pasting into editor panels.
+Users can add up to 4 panels and remove panels down to a minimum of 2.
+Differences between the first (base) panel and subsequent panels are highlighted in real-time.
+Users can generate a simple statistical summary (additions/removals).
+Users can generate an AI-powered summary by providing their own Google Gemini API key.
+The UI supports find & replace, code folding, synchronized scrolling, and multiple color themes.
+The application provides keyboard shortcuts for common actions (e.g., toggle find, AI summary, add/remove panel).
+Users can edit the titles of each panel, which influences the syntax highlighting.
+The system must provide instantaneous feedback for user actions like typing and scrolling.
+As a fully client-side application, user-entered code and text remain private and are not stored on any server. Only the text sent for an AI summary is transmitted to the Google API.
+The application must be responsive and fully functional on modern desktop web browsers.

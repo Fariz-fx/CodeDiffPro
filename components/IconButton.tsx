@@ -23,8 +23,10 @@ export const IconButton: React.FC<IconButtonProps> = ({
 
   return (
     <button
+      type="button"
       onClick={onClick}
       aria-label={ariaLabel}
+      aria-pressed={isActive ? 'true' : 'false'}
       disabled={disabled}
       className={`p-2 rounded-md transition-colors disabled:cursor-not-allowed disabled:bg-[var(--color-bg-tertiary)] disabled:text-[var(--color-text-disabled)] ${activeClasses} ${className}`}
     >
