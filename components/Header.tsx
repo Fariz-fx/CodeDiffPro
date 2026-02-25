@@ -35,7 +35,7 @@ export const Header: React.FC<HeaderProps> = ({
   return (
     <header className="flex-shrink-0 flex items-center justify-between bg-[var(--color-bg-secondary)] p-3 rounded-lg border border-[var(--color-border)]">
       <h1 className="text-xl font-bold text-[var(--color-text-primary)]">
-        CodeDiff <span className="text-[var(--color-accent)]">Pro</span>
+        CodeDiff <span className="text-[var(--color-accent)]">Diamond</span>
       </h1>
       <div className="flex items-center gap-4">
         <IconButton onClick={onToggleFind} ariaLabel="Find and Replace (Ctrl+F)">
