@@ -73,10 +73,10 @@ export const FindReplaceWidget: React.FC<FindReplaceWidgetProps> = ({
                         onChange={(e) => onReplaceQueryChange(e.target.value)}
                         className="flex-grow bg-[var(--color-bg-tertiary)] px-2 py-1 rounded-md text-sm outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
                     />
-                    <button onClick={onReplace} disabled={matchCount === 0} className="px-3 py-1 text-sm rounded-md bg-[var(--color-bg-tertiary)] text-[var(--color-text-primary)] hover:bg-[var(--color-bg-tertiary-hover)] disabled:opacity-50 disabled:cursor-not-allowed">
+                    <button type="button" onClick={onReplace} disabled={matchCount === 0} className="px-3 py-1 text-sm rounded-md bg-[var(--color-bg-tertiary)] text-[var(--color-text-primary)] hover:bg-[var(--color-bg-tertiary-hover)] disabled:opacity-50 disabled:cursor-not-allowed">
                         Replace
                     </button>
-                    <button onClick={onReplaceAll} disabled={matchCount === 0} className="px-3 py-1 text-sm rounded-md bg-[var(--color-bg-tertiary)] text-[var(--color-text-primary)] hover:bg-[var(--color-bg-tertiary-hover)] disabled:opacity-50 disabled:cursor-not-allowed">
+                    <button type="button" onClick={onReplaceAll} disabled={matchCount === 0} className="px-3 py-1 text-sm rounded-md bg-[var(--color-bg-tertiary)] text-[var(--color-text-primary)] hover:bg-[var(--color-bg-tertiary-hover)] disabled:opacity-50 disabled:cursor-not-allowed">
                         Replace All
                     </button>
                 </div>
